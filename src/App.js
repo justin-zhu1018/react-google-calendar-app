@@ -7,6 +7,7 @@ export default class App extends Component {
     super(props);
     this.state = {
       signedIn: '',
+      name: '',
     };
   }
   componentDidMount() {
@@ -38,6 +39,8 @@ export default class App extends Component {
           auth2.signIn().then(
             (val) => {
               console.log('Signed in?', val);
+              this.setState({name: val.rt.Ad});
+              console.log(val.rt.Ad);
               this.postSignIn();
             },
             (error) => {
@@ -61,6 +64,19 @@ export default class App extends Component {
   handleSignOut = () => {
     // window.gapi.signOut();
     console.log('signOut');
+    // var gapi = window.gapi;
+    window.gapi.auth2
+      .getAuthInstance()
+      .signOut()
+      .then(function () {
+        console.log(
+          'After sign out',
+          window.gapi.auth2.getAuthInstance().isSignedIn.get()
+        );
+        document.getElementById('authorize_button').style.display = 'block';
+        document.getElementById('signOut_button').style.display = 'none';
+      });
+    this.setState({name: ''});
   };
 
   consoleLogState = () => {
@@ -101,6 +117,7 @@ export default class App extends Component {
       <div className="App">
         <header className="App-header">
           <h1>Hello World</h1>
+          <h2>Name: {this.state.name}</h2>
           <button
             id="authorize_button"
             onClick={this.handleSignIn}

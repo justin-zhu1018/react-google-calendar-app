@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES} from './config.json';
 import './App.css';
+import {Button} from 'reactstrap';
 
 // LINKS: https://developers.google.com/calendar/quickstart/js
 // https://developers.google.com/identity/sign-in/web/listeners
@@ -64,15 +65,21 @@ export default class App extends Component {
         //signed in, so render an add event button and sign out button
         //visualize is a css descriptor to make the solid white boxes appear (in App.css)
         <div className="visualize">
-          <button onClick={this.handleAddEvent}>Add Event</button>
-          <button onClick={this.handleSignOut}>Sign Out</button>
+          <Button color="primary" onClick={this.handleAddEvent}>
+            Add Event
+          </Button>{' '}
+          <Button color="danger" onClick={this.handleSignOut}>
+            Sign Out
+          </Button>
         </div>
       );
     } else {
       //signed out, so render a sign in button
       return (
         <div className="visualize">
-          <button onClick={this.handleSignIn}>Sign In</button>
+          <Button color="success" onClick={this.handleSignIn}>
+            Sign In
+          </Button>
         </div>
       );
     }

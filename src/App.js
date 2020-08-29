@@ -6,6 +6,7 @@ import './App.css';
 // https://developers.google.com/identity/sign-in/web/listeners
 
 export default class App extends Component {
+  //stores your state components (kind of like variables)
   constructor(props) {
     super(props);
     this.state = {
@@ -13,12 +14,16 @@ export default class App extends Component {
       isSignedIn: null,
     };
   }
+
+  //Load gapi and start initialization process right when site loads
   componentDidMount() {
     window.gapi.load('client:auth2', () => {
       this.initializeGapi();
     });
   }
 
+  //gapi initialization and log in check. Google listener set up to determine if authorization is set up.
+  //If anything changes to the isSignedIn listener, this.handleAuthChange will be executed.
   initializeGapi = () => {
     window.gapi.client
       .init({
@@ -37,6 +42,10 @@ export default class App extends Component {
       });
   };
 
+  //Run when there is change in sign in / sign out boolean. If this function is run when user is signed in,
+  //Change the state of the name (usually blank, to the name of the account) and make the container div
+  //holding the name "name-div" appear. Regardless of sign in or sign out, the isSignedIn state variable
+  //will change accordingly. There is a listener that waits for change in this variable to render the buttons.
   handleAuthChange = () => {
     if (this.auth.isSignedIn.get()) {
       this.setState({name: this.auth.currentUser.get().rt.Ad});
@@ -45,6 +54,31 @@ export default class App extends Component {
     this.setState({isSignedIn: this.auth.isSignedIn.get()});
   };
 
+  //Used in the render. This is the listener sorta that waits for isSignedIn State variable to change.
+  //Once it changes the logic in the function to return the buttons accordingly (login view, logout view)
+  renderAuthButton() {
+    if (this.state.isSignedIn === null) {
+      return null;
+    } else if (this.state.isSignedIn) {
+      return (
+        //signed in, so render an add event button and sign out button
+        //visualize is a css descriptor to make the solid white boxes appear (in App.css)
+        <div className="visualize">
+          <button onClick={this.handleAddEvent}>Add Event</button>
+          <button onClick={this.handleSignOut}>Sign Out</button>
+        </div>
+      );
+    } else {
+      //signed out, so render a sign in button
+      return (
+        <div className="visualize">
+          <button onClick={this.handleSignIn}>Sign In</button>
+        </div>
+      );
+    }
+  }
+
+  //Google Calendar add an event. onClick for Add Event Button
   handleAddEvent = () => {
     console.log('Add event!');
     var event = {
@@ -83,38 +117,26 @@ export default class App extends Component {
     });
   };
 
-  renderAuthButton() {
-    if (this.state.isSignedIn === null) {
-      return null;
-    } else if (this.state.isSignedIn) {
-      return (
-        <div>
-          <button onClick={this.handleAddEvent}>Add Event</button>
-          <button onClick={this.handleSignOut}>Sign Out</button>
-        </div>
-      );
-    } else {
-      return <button onClick={this.handleSignIn}>Sign In</button>;
-    }
-  }
-
+  //onClick for Sign Out button. this.auth is the gapi/google api. Signs user out, name on screen gets removed.
   handleSignOut = () => {
     this.auth.signOut();
     this.setState({name: ''});
+    document.getElementById('name-div').style.display = 'none';
   };
 
+  //onClick for Sign In button. this.auth is the gapi/google api. Opens the popup window to prompt user to sign in.
   handleSignIn = () => {
     this.auth.signIn();
   };
 
+  //What your webpage will show
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <h1>Welcome to Event Adder</h1>
-          <div id="name-div" style={{display: 'block'}}>
-            {' '}
-            <h2> {this.state.name}</h2>
+          <h1 className="visualize">Welcome to Event Adder</h1>
+          <div id="name-div" className="visualize" style={{display: 'none'}}>
+            <h2>{this.state.name}</h2>
           </div>
 
           <div>{this.renderAuthButton()}</div>
